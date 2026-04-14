@@ -1,0 +1,7 @@
+---
+- name: Set taint on control-plane node (single-node cluster)
+  ansible.builtin.shell:
+    cmd: "kubectl taint nodes --all node-role.kubernetes.io/control-plane-"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  when: install_single_node_cluster

@@ -1,0 +1,14 @@
+---
+# This variable defines the CIDR range for the pod network. It should match the CIDR used by the CNI Flannel plugin. 
+pod_network_cidr: "10.244.0.0/16"
+
+# This variable defines the ip of the master node.
+master_ip: "192.168.1.94"
+
+# This variable defines the hostname of the master node.
+master_hostname: "kube-master"
+
+# This variable is used to determine if the cluster being installed is a single-node cluster
+# (control-plane node also acts as a worker node). If set to true, the playbook will include tasks
+# to remove the taint from the control-plane node, allowing it to schedule pods.
+install_single_node_cluster: true

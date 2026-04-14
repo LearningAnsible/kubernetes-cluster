@@ -1,0 +1,17 @@
+---
+- name: "Get current swap"
+  ansible.builtin.shell: free -m | grep Swap | awk '{print $2}'
+  register: swap_used
+
+- block:
+    - name: "Disable SWAP"
+      ansible.builtin.shell: swapoff -a
+
+    - name: "Disable SWAP permanently"
+      ansible.builtin.replace:
+        path: /etc/fstab
+        regexp: '^([^#].*\sswap\s.*)$'
+        replace: '# \1'
+
+  when: (swap_used.stdout_lines[0] | int) > 0
+...

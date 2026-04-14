@@ -1,0 +1,28 @@
+---
+- name: "Add Kubernetes repository"
+  ansible.builtin.copy:
+    dest: "/etc/yum.repos.d/kubernetes.repo"
+    content: |
+      [kubernetes]
+      name=Kubernetes
+      baseurl=https://pkgs.k8s.io/core:/stable:/v1.35/rpm/
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://pkgs.k8s.io/core:/stable:/v1.35/rpm/repodata/repomd.xml.key
+
+- name: "Install kubectl, kubeadm and kubelet"
+  ansible.builtin.package:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  loop:
+    - kubectl
+    - kubeadm
+    - kubelet
+
+- name: "Start and Enable kubelet service"
+  ansible.builtin.systemd_service:
+    name: kubelet
+    enabled: true
+    state: started
+...

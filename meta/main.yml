@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+galaxy_info:
+  role_name: kubernetes-cluster
+  author: Alejandro López
+  description: Install and configure a Kubernetes cluster on Red Hat Enterprise Linux 10 using kubeadm.
+  license: CC BY-NC-SA
+  min_ansible_version: 2.2
+  galaxy_tags: []
+dependencies: []

@@ -1,0 +1,32 @@
+---
+- name: "Include vars file"
+  ansible.builtin.include_vars:
+    file: '../vars/main.yml'
+
+# - name: "Include disable SWAP"
+#   ansible.builtin.include_tasks: './disable_swap.yml'
+
+# - name: "Include create config files"
+#   ansible.builtin.include_tasks: './config_files.yml'
+
+# - name: "Include install containerd"
+#   ansible.builtin.include_tasks: './install_containerd.yml'
+
+# - name: "Include install kubernetes"
+#   ansible.builtin.include_tasks: './install_kubernetes.yml'
+
+# - name: "Include config ports"
+#   ansible.builtin.include_tasks: './config_ports.yml'
+
+# - name: "Include config hosts"
+#   ansible.builtin.include_tasks: './config_hosts.yml'
+
+# - name: "Include start cluster"
+#   ansible.builtin.include_tasks: './start_cluster.yml'
+
+# - name: "Include install flannel"
+#   ansible.builtin.include_tasks: './install_flannel.yml'
+
+- name: "Include single node cluster config"
+  ansible.builtin.include_tasks: './single_node.yml'
+  when: install_single_node_cluster

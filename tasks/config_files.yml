@@ -1,0 +1,12 @@
+---
+- name: "Creating 99-kubernetes-cri.conf"
+  ansible.builtin.copy:
+    dest: "/etc/sysctl.d/99-kubernetes-cri.conf"
+    content: |
+      net.bridge.bridge-nf-call-iptables = 1
+      net.ipv4.ip_forward = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+
+- name: "Apply sysctl params"
+  ansible.builtin.command: sysctl --system
+...

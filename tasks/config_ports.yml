@@ -1,0 +1,9 @@
+---
+- name: Add firewall rules for Kubernetes API server and kubelet
+  ansible.posix.firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+  loop:
+    - 6443
+    - 10250
