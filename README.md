@@ -24,8 +24,6 @@ Define las variables según tu entorno:
 pod_network_cidr: "10.244.0.0/16"      # CIDR de la red de pods (Flannel)
 master_ip: "192.168.1.94"               # IP del nodo master
 master_hostname: "kube-master"          # Hostname del nodo master
-worker_ip: "192.168.1.95"               # IP del nodo worker (si aplica)
-worker_hostname: "kube-worker"          # Hostname del nodo worker (si aplica)
 install_single_node_cluster: false      # true si deseas un cluster de nodo único
 ```
 
@@ -43,8 +41,8 @@ Asegúrate de que los hosts y credenciales sean correctos:
 kube:
     hosts:
         kube-master:
-            ansible_user: ansible           # Usuario SSH
-            ansible_password: ansible      # Contraseña SSH
+            ansible_user: ansible             # Usuario SSH
+            ansible_password: ansible         # Contraseña SSH
             ansible_host_key_checking: false
         kube-worker:
             ansible_user: ansible
