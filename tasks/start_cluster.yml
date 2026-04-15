@@ -2,12 +2,4 @@
 - name: "Start Kubernetes cluster"
   ansible.builtin.shell: 
     cmd: "kubeadm init --pod-network-cidr {{ pod_network_cidr }}"
-
-- name: "Config cluster"
-  ansible.builtin.shell:
-    cmd: |
-      mkdir -p $HOME/.kube
-      cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-      chown $(id -u):$(id -g) $HOME/.kube/config
-    become: false
 ...
