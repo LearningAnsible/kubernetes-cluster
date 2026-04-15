@@ -103,7 +103,7 @@ ansible-playbook -i inventory main.yml --check
 Durante la ejecución, el playbook realizará:
 
 1. ✅ Inclusión de variables
-2. ✅ Deshabilitación de SWAP (comentado por defecto)
+2. ✅ Deshabilitación de SWAP
 3. ✅ Instalación de containerd (runtime de contenedores)
 4. ✅ Instalación de Kubernetes (kubeadm, kubectl, kubelet)
 5. ✅ Configuración de puertos y firewall
