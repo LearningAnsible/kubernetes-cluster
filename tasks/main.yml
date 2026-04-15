@@ -3,6 +3,10 @@
   ansible.builtin.include_vars:
     file: '../vars/main.yml'
 
+- name: "Include config hosts"
+  ansible.builtin.include_tasks: './config_hosts.yml'
+  when: inventory_hostname == master_hostname
+
 - name: "Include disable SWAP"
   ansible.builtin.include_tasks: './disable_swap.yml'
 
@@ -18,10 +22,6 @@
 
 - name: "Include config ports"
   ansible.builtin.include_tasks: './config_ports.yml'
-  when: inventory_hostname == master_hostname
-
-- name: "Include config hosts"
-  ansible.builtin.include_tasks: './config_hosts.yml'
   when: inventory_hostname == master_hostname
 
 - name: "Include start cluster"
