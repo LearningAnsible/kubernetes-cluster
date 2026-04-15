@@ -12,7 +12,6 @@
 
 - name: "Include create config files"
   ansible.builtin.include_tasks: './config_files.yml'
-  when: inventory_hostname == master_hostname
 
 - name: "Include install containerd"
   ansible.builtin.include_tasks: './install_containerd.yml'
