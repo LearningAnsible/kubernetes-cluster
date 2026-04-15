@@ -143,7 +143,6 @@ kubectl cluster-info
 ```
 NAME          STATUS   ROLES           AGE     VERSION
 kube-master   Ready    control-plane   5m      v1.xx.x
-kube-worker   Ready    <none>          3m      v1.xx.x
 ```
 
 ## 🔄 Paso 8: Agregar Workers (Opcional)
