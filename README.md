@@ -1,217 +1,225 @@
-# Kubernetes Cluster - Ansible Role
+# Guía de Ejecución
 
-[![License: CC BY-NC-SA](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
+## 📋 Prerrequisitos
 
-Rol de Ansible para instalar y configurar un cluster de Kubernetes en Red Hat Enterprise Linux 10 usando **kubeadm**.
+Antes de ejecutar el módulo, asegúrate de tener:
 
-## Descripción
+- **Ansible 2.2+** instalado en tu máquina de control
+- **Red Hat Enterprise Linux 10** en los nodos destino
+- **Conectividad SSH** a los nodos (sin requerir contraseña o con credenciales configuradas)
+- **Acceso root o permisos sudo** en los nodos
+- **Red estable** entre los nodos
 
-Este rol automatiza la instalación y configuración de un cluster de Kubernetes en sistemas RHEL 10. Incluye la instalación de componentes esenciales como:
+## 🔧 Paso 1: Configurar las Variables
 
-- **containerd** - runtime de contenedores
-- **Kubernetes** - orquestación de contenedores (kubectl, kubeadm, kubelet)
-- **Flannel** - plugin de red (CNI)
-
-El rol soporta tanto instalaciones de cluster multi-nodo como clusters de nodo único (control-plane que actúa como worker).
-
-## Requisitos
-
-- Red Hat Enterprise Linux 10
-- Ansible 2.2 o superior
-- Acceso root o permisos sudo en los nodos destino
-- Conectividad de red entre los nodos
-
-## Características
-
-✅ Instalación automatizada de Kubernetes  
-✅ Configuración de containerd como runtime  
-✅ Instalación y configuración de Flannel (CNI)  
-✅ Soporte para clusters de nodo único  
-✅ Configuración automática de hosts y puertos  
-✅ Deshabilitación de swap  
-
-## Variables Principales
-
-Las principales variables se encuentran en `vars/main.yml`:
-
-```yaml
-# CIDR de la red de pods (debe coincidir con la configuración de Flannel)
-pod_network_cidr: "10.244.0.0/16"
-
-# Dirección IP del nodo master
-master_ip: "192.168.1.94"
-
-# Nombre del nodo master
-master_hostname: "kube-master"
-
-# Instalar como cluster de nodo único
-install_single_node_cluster: true
-```
-
-## Estructura del Rol
-
-```
-├── defaults/           # Variables por defecto
-├── files/              # Archivos estáticos
-├── handlers/           # Handlers de Ansible
-├── meta/               # Información del rol
-├── tasks/              # Tareas principales
-│   ├── main.yml                    # Orquestador de tareas
-│   ├── disable_swap.yml            # Deshabilitar swap
-│   ├── config_files.yml            # Configurar archivos
-│   ├── config_hosts.yml            # Configurar /etc/hosts
-│   ├── config_ports.yml            # Configurar puertos
-│   ├── install_containerd.yml      # Instalar runtime
-│   ├── install_flannel.yml         # Instalar CNI
-│   ├── install_kubernetes.yml      # Instalar K8s
-│   ├── start_cluster.yml           # Iniciar cluster
-│   └── single_node.yml             # Config de nodo único
-├── templates/          # Plantillas Jinja2
-└── vars/               # Variables del rol
-```
-
-## Uso
-
-### 1. Configurar el intento
-
-Editar `vars/main.yml` con los parámetros de tu cluster:
-
-```yaml
-pod_network_cidr: "10.244.0.0/16"
-master_ip: "YOUR_IP"
-master_hostname: "YOUR_HOSNAME"
-install_single_node_cluster: true
-```
-
-### 2. Crear un playbook
-
-```yaml
----
-- name: Instalar cluster Kubernetes
-  hosts: k8s_nodes
-  become: yes
-  roles:
-    - kubernetes_cluster
-```
-
-### 3. Ejecutar el playbook
+Edita el archivo `vars/main.yml` con tus parámetros:
 
 ```bash
-ansible-playbook -i inventory playbook.yml
+nano vars/main.yml
 ```
 
-## Tareas Disponibles
-
-El rol incluye las siguientes tareas (puede habilitarlas/deshabilitarlas en `tasks/main.yml`):
-
-| Tarea | Descripción |
-|-------|-------------|
-| `disable_swap.yml` | Deshabilita swap en los nodos |
-| `config_files.yml` | Crea archivos de configuración necesarios |
-| `install_containerd.yml` | Instala y configura containerd |
-| `install_kubernetes.yml` | Instala kubectl, kubeadm y kubelet |
-| `config_ports.yml` | Configura puertos del firewall |
-| `config_hosts.yml` | Configura resolución de nombres |
-| `start_cluster.yml` | Inicia el cluster de Kubernetes |
-| `install_flannel.yml` | Instala plugin de red Flannel |
-| `single_node.yml` | Remueve taints para nodos únicos |
-
-## Configuración de Nodo Único
-
-Para instalar un cluster de nodo único (desarrollo/pruebas):
+Define las variables según tu entorno:
 
 ```yaml
-install_single_node_cluster: true
+pod_network_cidr: "10.244.0.0/16"      # CIDR de la red de pods (Flannel)
+master_ip: "192.168.1.94"               # IP del nodo master
+master_hostname: "kube-master"          # Hostname del nodo master
+worker_ip: "192.168.1.95"               # IP del nodo worker (si aplica)
+worker_hostname: "kube-worker"          # Hostname del nodo worker (si aplica)
+install_single_node_cluster: false      # true si deseas un cluster de nodo único
 ```
 
-Esto configurará el nodo control-plane como worker, permitiendo que ejecute cargas de trabajo.
+## 📝 Paso 2: Configurar el Inventario
 
-## Componentes Instalados
+Edita el archivo `inventory` con los datos de conexión SSH:
 
-- **Kubernetes v1.35** - Desde repositorio oficial de Kubernetes
-- **containerd** - Runtime de contenedores OCI
-- **Flannel** - Plugin de red (CNI)
-- **kubeadm** - Herramienta de bootstrapping
-- **kubectl** - Cliente de línea de comandos
-- **kubelet** - Agente del nodo
+```bash
+nano inventory
+```
 
-## Inventario de ejemplo
+Asegúrate de que los hosts y credenciales sean correctos:
 
 ```yaml
 kube:
     hosts:
-        localhost:
+        kube-master:
+            ansible_user: ansible           # Usuario SSH
+            ansible_password: ansible      # Contraseña SSH
+            ansible_host_key_checking: false
+        kube-worker:
             ansible_user: ansible
             ansible_password: ansible
             ansible_host_key_checking: false
 ```
 
-## Configuración de Red
-
-El rol utiliza **Flannel** como plugin de red (CNI). La configuración por defecto:
-
-- **CIDR de pods**: `10.244.0.0/16`
-- **Backend**: VXLAN (puerto 8472/UDP)
-
-Estas configuraciones pueden ajustarse modificando las variables.
-
-## Añadir un worker al cluster
-
-Para añadir un worker al cluster, hemos de ejecutar el siguiente comando en el nodo master:
-
-```bash
-kubeadm token create --print-join-command
+**Alternativa más segura:** Usa claves SSH en lugar de contraseñas:
+```yaml
+kube:
+    hosts:
+        kube-master:
+            ansible_user: ansible
+            ansible_host: 192.168.1.94
+            ansible_private_key_file: ~/.ssh/id_rsa
+            ansible_host_key_checking: false
 ```
 
-Esto nos mostrará un comando como el siguiente:
+## ✅ Paso 3: Verificar Conectividad
+
+Verifica que Ansible puede conectar con los nodos:
 
 ```bash
-kubeadm join 192.168.1.94:6443 --token abc123.xyzabc123 --discovery-token-ca-cert-hash sha256:abc123...
+ansible all -i inventory -m ping
 ```
 
-### Pasos para añadir el worker:
+Salida esperada:
+```
+kube-master | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+```
 
-1. **En el nodo master**: Ejecutar el comando anterior para obtener el token de unión
-2. **En el worker**: Ejecutar el comando con sudo:
-   ```bash
-   sudo kubeadm join 192.168.1.94:6443 --token abc123.xyzabc123 --discovery-token-ca-cert-hash sha256:abc123...
-   ```
-3. **Verificar conexión**: En el master, esperar unos segundos y ejecutar:
-   ```bash
-   kubectl get nodes
-   ```
+## 🚀 Paso 4: Ejecutar el Playbook Principal
 
-El worker debería aparecer en la lista con estado `Ready` en pocos minutos.
-
-## Troubleshooting
-
-### Verificar estado del cluster
+Ejecuta el playbook para instalar y configurar el cluster Kubernetes:
 
 ```bash
+ansible-playbook -i inventory main.yml
+```
+
+**Opciones útiles:**
+
+```bash
+# Con modo verbose (más detalles de ejecución)
+ansible-playbook -i inventory main.yml -v
+
+# Modo extra verbose (mucha más información)
+ansible-playbook -i inventory main.yml -vv
+
+# Simular sin hacer cambios (dry-run)
+ansible-playbook -i inventory main.yml --check
+```
+
+## 📊 Paso 5: Monitorear la Ejecución
+
+Durante la ejecución, el playbook realizará:
+
+1. ✅ Inclusión de variables
+2. ✅ Deshabilitación de SWAP (comentado por defecto)
+3. ✅ Instalación de containerd (runtime de contenedores)
+4. ✅ Instalación de Kubernetes (kubeadm, kubectl, kubelet)
+5. ✅ Configuración de puertos y firewall
+6. ✅ Inicialización del cluster (en nodo master)
+7. ✅ Instalación de Flannel (CNI plugin)
+8. ✅ Configuración de nodo único (si aplica)
+
+## ⚙️ Paso 6: Conficurar cliente kubectl
+
+Una vez completado el job de ansible ejectamos lo siguente para tener la conexion de kubectl con el cluster:
+
+```bash
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+## ✔️ Paso 7: Verificar la Instalación
+
+Una vez completado, verifica que el cluster esté funcionando:
+
+### En el nodo master:
+
+```bash
+# Verificar nodos
 kubectl get nodes
-kubectl get pods -A
-kubectl get svc -A
+
+# Verificar pods del sistema
+kubectl get pods -n kube-system
+
+# Verificar estado del cluster
+kubectl cluster-info
 ```
 
-### Ver logs del kubelet
+### Estado esperado:
+
+```
+NAME          STATUS   ROLES           AGE     VERSION
+kube-master   Ready    control-plane   5m      v1.xx.x
+kube-worker   Ready    <none>          3m      v1.xx.x
+```
+
+## 🔄 Paso 8: Agregar Workers (Opcional)
+
+2. **Obtén el token de unión en el master:**
+   ```bash
+   sudo kubeadm token create --print-join-command
+   ```
+
+3. **Ejecuta el comando de unión en el worker (como root):**
+   ```bash
+   sudo kubeadm join <master-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+   ```
+
+## ⚠️ Solución de Problemas
+
+### Error: "Host key verification failed"
+
+**Solución:** Desactiva la verificación de claves en SSH:
+```bash
+export ANSIBLE_HOST_KEY_CHECKING=False
+ansible-playbook -i inventory main.yml
+```
+
+### Error: "Connection refused" o "No route to host"
+
+**Solución:** Verifica:
+- Conectividad de red entre nodos
+- Firewall habilitado/deshabilitado
+- IPs correctas en inventory y vars/main.yml
+
+### Verificar estado de la instalación
 
 ```bash
-systemctl status kubelet
-journalctl -u kubelet -n 50
+# Ver logs de kubelet
+sudo journalctl -u kubelet -n 50
+
+# Ver logs de Kubernetes
+sudo kubectl describe node <nombre-nodo>
 ```
 
-### Información del nodo
+## 🎯 Casos de Uso Comunes
+
+### Instalar un cluster de nodo único
+
+Edita `vars/main.yml`:
+```yaml
+install_single_node_cluster: true
+```
+
+El nodo master actuará como worker, permitiendo ejecutar pods en él.
+
+### Reinstalar desde cero
 
 ```bash
-kubectl describe node <node-name>
+# Limpiar el cluster anterior (en master)
+sudo kubeadm reset --force
+
+# Ejecutar el playbook nuevamente
+ansible-playbook -i inventory main.yml
 ```
 
-## Autor
+## 📚 Referencia Rápida
 
-- **Alejandro López**
+| Comando | Descripción |
+|---------|-------------|
+| `ansible-playbook -i inventory main.yml` | Ejecutar instalación completa |
+| `ansible all -i inventory -m ping` | Verificar conectividad |
+| `kubectl get nodes` | Ver estado de nodos |
+| `kubectl get pods -A` | Ver todos los pods |
+| `sudo kubeadm token create --print-join-command` | Token para agregar workers |
+| `kubectl apply -f <archivo.yaml>` | Desplegar aplicación |
 
-## Licencia
+---
 
-Este proyecto está bajo la licencia Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).
-
-No se permite el uso comercial sin permiso del autor.
+**Última actualización:** Abril 2026  
+**Versión:** 1.0
