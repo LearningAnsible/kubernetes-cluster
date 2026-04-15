@@ -12,3 +12,6 @@ master_hostname: "kube-master"
 # (control-plane node also acts as a worker node). If set to true, the playbook will include tasks
 # to remove the taint from the control-plane node, allowing it to schedule pods.
 install_single_node_cluster: true
+
+worker_ip: "192.168.1.95"
+worker_hostname: "kube-worker"
