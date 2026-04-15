@@ -5,5 +5,3 @@
     line: "{{ item }}"
   loop:
     - "{{ master_ip }} {{ master_hostname }}"
-    # - "{{ worker1_ip }} {{ worker1_hostname }}"
-    # - "{{ worker2_ip }} {{ worker2_hostname }}"

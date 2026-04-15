@@ -1,6 +1,10 @@
 kube:
     hosts:
-        localhost:
+        kube-master:
+            ansible_user: ansible
+            ansible_password: ansible
+            ansible_host_key_checking: false
+        kube-worker:
             ansible_user: ansible
             ansible_password: ansible
             ansible_host_key_checking: false
