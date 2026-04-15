@@ -184,6 +184,15 @@ sudo journalctl -u kubelet -n 50
 sudo kubectl describe node <nombre-nodo>
 ```
 
+### Autocompletado con kubectl
+
+Para habilitar el autocompeltado ejecutamos lo siguiente:
+
+```bash
+echo 'source <(kubectl completion bash)' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ## 🎯 Casos de Uso Comunes
 
 ### Instalar un cluster de nodo único
