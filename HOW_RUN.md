@@ -119,8 +119,8 @@ Una vez completado el job de ansible ejectamos lo siguente para tener la conexio
 
 ```bash
 mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
 ## ✔️ Paso 7: Verificar la Instalación
